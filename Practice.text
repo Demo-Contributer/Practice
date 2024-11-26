@@ -510,3 +510,98 @@ group by d.department_name
 order by number_emp DESC
 LIMIT 1;
 
+-----------------------------------------------------------------------------
+
+Assignment 9
+
+"""Q2 Write a PL/SQL code to find whether a given string is palindrome or not."""
+
+DELIMITER $$
+CREATE PROCEDURE check_palindrome(IN input_str VARCHAR(255))
+BEGIN
+    DECLARE reversed_str VARCHAR(255);
+    SET reversed_str = REVERSE(input_str);
+
+    IF input_str = reversed_str THEN
+        SELECT 'The string is a palindrome.' AS result;
+    ELSE
+        SELECT 'The string is NOT a palindrome.' AS result;
+    END IF;
+END $$
+DELIMITER ;
+
+Call check_palindrome("RADA");
+
+-----
+
+"""Q4 Your company has an employee management system with a table named employees containing
+columns such as employee_id, first_name, last_name, salary, and department_id.-Write a PL/SQL stored procedure named update_salary that takes an employee_id and a
+percentage increase, then updates the employee's salary by the given percentage.-Additionally, ensure the procedure checks if the employee_id exists, and if not, it should raise a
+custom exception."""
+
+CREATE Procedure emp(IN eid INT, IN inc INT)
+BEGIN
+UPDATE employees
+SET Salary = salary * inc Where employee_id = eid;
+END $$
+DELIMITER ;
+CALL emp(1, 2);
+
+-----
+
+"""Q5  5)Scenario 2: Inventory Control
+Question:-You are tasked with managing the inventory for an online store. There is a table inventory with
+columns product_id, product_name, quantity, and price.-Write a PL/SQL function named calculate_inventory_value that returns the total value of the
+inventory (sum of quantity * price for all products).-This function should be called within a PL/SQL block to display the total inventory value."""
+
+DELIMITER $$
+CREATE PROCEDURE total_revenue()
+BEGIN
+SELECT SUM(quantity*price) FROM inventory;
+END$$
+
+call total_revenue();
+
+-----------------------------------------------------------------------------
+
+Assignment 10
+
+"""Q1 Consider the Following schema
+Emp (eno, ename, designation, salary, dno)
+Dept (dno dname,dhod)
+Create the trigger on emp Table: The deleted record from the emp table should be insert
+in Dummy Table"""
+
+DELIMITER $$
+CREATE TRIGGER Del_emp
+AFTER DELETE ON Emp
+FOR EACH ROW
+BEGIN
+INSERT INTO dummy VALUES (old.eno, old.ename, old.designation, old.salary, old.dno);
+END$$
+
+-----
+
+"""Q2 Consider the Following schema
+Boats(Bid, Name, Bcolor)
+Sailors(Sid,Sname, Srating)
+Reserves (Bid, Sid, Date of Reservation)
+Create the trigger on Sailors Table: The Rating of the Sailor should get incremented by 1
+once the sailor reserves a boat."""
+
+DELIMITER $$
+CREATE TRIGGER Incrating
+AFTER INSERT ON Reserves
+FOR EACH ROW
+BEGIN
+UPDATE Sailors set Srating = Srating + 1
+WHERE Sid = new.Sid;
+END$$
+
+
+-----
+
+
+
+
+
