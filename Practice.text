@@ -1,610 +1,294 @@
-Assignment 2
-
-
-"""Q1 Write a SQLstatement to create a table named countries including columns
-country_id,country_name and region_id and make sure that no duplicate data against column
-country_id will be allowed at the time of insertion"""
-
-create table countries(
-country_id int(3) primary key,
-country_name varchar(30),
-region_id int(3));
-
------
-
-"""Q2 Write the SQL DDL command to create a table named Publishers with the following
-columns:
-PublisherID (Primary Key, Integer, Auto Increment)
-Name (VARCHAR, Not Null)
-Address (VARCHAR, Not Null)
-Phone (VARCHAR)
-Write the SQL DDL command to add a unique constraint on the Name column of the
-Publishers table.
-Write the SQL DDL command to add a new column ISBN (VARCHAR, Not Null, Unique)
-to the Publishers table. """
-
-create table publisher (
-PublisherID int(3) primary key AUTO_INCREMENT,
-Name varchar(30) not null,
-Address varchar(30) not null,
-Phone varchar(30));
-
-ALTER TABLE publisher Modify Name varchar(30) not null unique;
-ALTER TABLE publisher add ISBN varchar(30) not null unique;
-
------
-
-"""Q3 Write the SQL DDL commandtocreate a table named Employees with the following
-columns:
-EmployeeID (Primary Key, Integer, Auto Increment)
-FirstName (VARCHAR, Not Null)
-LastName (VARCHAR, Not Null)
-BirthDate (DATE, Not Null)
-HireDate (DATE, Not Null)
-Salary (DECIMAL, Not Null)
-Write the SQL DDL command to add a new column Department (VARCHAR, Not Null) to
-the Employees table.
-Write the SQL DDL command to drop the Salary column from the Employees table.
-Write the SQL DDL command to rename the HireDate column in the Employees table to
-StartDate."""
-
-create table Employees(
-EmployeeID int(3) primary key AUTO_INCREMENT,
-FirstName varchar(30) not null,
-LastName varchar(30) not null,
-BirthDate date not null,
-HireDate date not null,
-salary decimal(10,2) not null);
-
-Alter table employees add Department varchar(30) not null;
-Alter table employees drop column salary;
-Alter table employees rename column HireDate to StartDate;
-
------
-
-"""Q4 Create Tables as follows by choosing appropriate data type and set the necessary
-primary and foreign key constraints:
-Customer (Custid, Custname, Addr, phno,panno)
-Loan (Loanid, Amount, Interest,Custid)
-Account (Accd, Accbal, Custid).
-Add a column CUSDOB in customer table"""
-
-create table Customer(
-Custid int(3) primary key,
-Custname varchar(30) not null,
-Addr varchar(30) not null,
-phno varchar(10) not null,
-panno varchar(10) not null unique);
-
-create table Loan(
-Loanid int(3) primary key,
-Amount int(10) not null,
-Interest decimal(10,5) not null,
-Custid int(3),
-foreign key (Custid) references Customer(Custid));
-
-create table Account(
-Accid int(3) primary key,
-Accbal decimal(10,3),
-Custid int(3),
-foreign key (Custid) references Customer(Custid));
-
-Alter table Customer add Cusdob date;
-
------------------------------------------------------------------------------
-
-Assignment 3
-
-
-"""Q1 Write a query to insert a new customer into the Customers table. 
-Ensure that the Email is unique and does not duplicate an existing email."""
-
-INSERT INTO Customer (Custid, Custname, Addr, phno, panno, CUSDOB, Email)
-SELECT 101, 'John Doe', '123 Elm St', '9876543210', 'ABCDE1234F', '1985-07-15', 'johndoe@example.com'
-WHERE NOT EXISTS (
-    SELECT 1
-    FROM Customer
-    WHERE Email = 'johndoe@example.com'
-);
-
------
-
-"""Q2 Consider the schema: employee(employee-name, street, city)
-works(employee-name, company-name, salary)
-company(company-name, city)
-manages(employee-name, manager-name)
-Give an SQL DDL definition for the tables of this database. Identify referential integrity
-constraints that should hold and include them in the DDL definition."""
-
-CREATE TABLE employee (
-    employee_name VARCHAR(100) PRIMARY KEY, 
-    street VARCHAR(255) NOT NULL,          
-    city VARCHAR(100) NOT NULL             
-);
-
-CREATE TABLE works (
-    employee_name VARCHAR(100),            
-    company_name VARCHAR(100),             
-    salary DECIMAL(10, 2) NOT NULL,        
-    PRIMARY KEY (employee_name, company_name), 
-    FOREIGN KEY (employee_name) REFERENCES employee(employee_name) 
-        ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY (company_name) REFERENCES company(company_name)
-        ON DELETE CASCADE ON UPDATE CASCADE
-);
-
-CREATE TABLE company (
-    company_name VARCHAR(100) PRIMARY KEY, 
-    city VARCHAR(100) NOT NULL          
-);
-
-CREATE TABLE manages (
-    employee_name VARCHAR(100),            
-    manager_name VARCHAR(100),             
-    PRIMARY KEY (employee_name, manager_name),
-    FOREIGN KEY (employee_name) REFERENCES employee(employee_name)
-        ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY (manager_name) REFERENCES employee(employee_name)
-        ON DELETE CASCADE ON UPDATE CASCADE
-);
-
------
-
-"""Q3 Write an SQL statement to create an Orders table that ensures the CustomerID must exist in
-the Customers table."""
-
-Create table orders(
-CustomerID int(3) primary key,
-Amount int(10) not null,
-Qty int(10) not null);
-
------
-
-
-"""Q4 Write an SQL statement to create a Customers table that enforces unique email addresses."""
-
-Create table Customers(
-Cid int(3) primary key,
-email varchar(30) unique not null);
-
------
-
-"Q5  Questions:
-1. Scenario 1: A new product is added to the inventory with a negative stock quantity by
-mistake. Describe the constraint that will prevent this, and write the SQL statement that
-ensures the stock quantity cannot be negative.
-2. Scenario 2: An order is placed by a customer, but the customer ID entered does not exist in
-the Customers table. Describe the constraint that will prevent this, and write the SQL
-statement that will enforce this rule.
-3. Scenario 3: A customer tries to create an account using an email that is already in use by
-another customer. Describe the constraint that will prevent this, and write the SQL
-statement that ensures email addresses are unique.
-4. Scenario 4: An order detail is added with a quantity of 0. Describe the constraint that will
-prevent this, and write the SQL statement to enforce a minimum quantity of 1 for each
-order detail.
-
-CREATE TABLE Customers (
-    CustomerID INT PRIMARY KEY,                 
-    FirstName VARCHAR(100) NOT NULL,           
-    LastName VARCHAR(100) NOT NULL,            
-    Email VARCHAR(150) UNIQUE NOT NULL,        
-    PhoneNumber VARCHAR(15)                 
-);
-
-CREATE TABLE Products (
-    ProductID INT PRIMARY KEY,                 
-    ProductName VARCHAR(200) NOT NULL,         
-    Price DECIMAL(10, 2) NOT NULL,             
-    StockQuantity INT NOT NULL,                
-    CONSTRAINT chk_stock_quantity CHECK (StockQuantity >= 0) 
-);
-
-CREATE TABLE Orders (
-    OrderID INT PRIMARY KEY,                   
-    OrderDate DATE NOT NULL,                   
-    CustomerID INT,                           
-    TotalAmount DECIMAL(10, 2) NOT NULL,       
-    FOREIGN KEY (CustomerID) REFERENCES Customers(CustomerID)
-        ON DELETE CASCADE ON UPDATE CASCADE    
-);
-
-CREATE TABLE OrderDetails (
-    OrderDetailID INT PRIMARY KEY,             
-    OrderID INT,                               
-    ProductID INT,                             
-    Quantity INT NOT NULL,                     
-    Price DECIMAL(10, 2) NOT NULL,             
-    FOREIGN KEY (OrderID) REFERENCES Orders(OrderID)
-        ON DELETE CASCADE ON UPDATE CASCADE,   
-    FOREIGN KEY (ProductID) REFERENCES Products(ProductID)
-        ON DELETE CASCADE ON UPDATE CASCADE,  
-    CONSTRAINT chk_quantity CHECK (Quantity > 0) 
-);
-
-
------------------------------------------------------------------------------
-
-Assignment 4
-
-"""Q1 Design an SQL command to insert a new product record into the "Products" table of the
-online store database, including details such as product name, price, quantity available, and
-category."""
-
-insert into Products values ("Laptop", "10", "300", "Electronic");
-
------
-
-"""Q2 Create a set of DML commands to update the "Employee" table in the HR database,
-modifying the salary of an employee based on their 
-performance rating and position."""
-
-Update Employee set salary = salary + 5000 where p_rating = 'A' and position = "HR";
-Update Employee set salary = salary + 500 where p_rating = 'B' and position = "Intern";
-
------
-
-"""Q3 Develop an SQL script to delete all inactive user accounts from the "Users" table of the
-social networking database, where the last login date is older than six months
-
-DELETE FROM Users
-WHERE LastLoginDate < DATE_SUB(CURDATE(), INTERVAL 6 MONTH);
-
------------------------------------------------------------------------------
-
-Assignment 5
-
-"""Q1 Write a query to calculate the following from the employees table:
- ● Thetotal number of employees.
- ● Theaverage salary.
- ● Thehighest salary.
- ● Thelowest salary.
- ● Thesumofall salaries.
-Using the employees table, write a query to find the average salary and total salary for each
-department"""
-
-select count(EmployeeId) from Employees;
-select AVG(Salary) from Employees;
-select MAX(salary) from Employees;
-select MIN(Salary) from Employees;
-select SUM(Salary) from Employees;
-
-select Department, AVG(Salary)
-From Employees
-Group By Department;
-
------
-
-"""Q2  Using the students and grades tables, write a query to find the highest average
-grade achieved by any student. (Assume suitable data)"""
-
-SELECT s.student_id, 
-       s.first_name, 
-       s.last_name, 
-       AVG(g.grade) AS average_grade
-FROM students s
-JOIN grades g ON s.student_id = g.student_id
-GROUP BY s.student_id
-ORDER BY average_grade DESC
-LIMIT 1;
-
------
-
-"""Q3 Sales Data Analysis
-Scenario: You are analyzing sales data for an e-commerce platform.
-● Task:Calculate the total revenue and round it to two decimal places.
-● Table: sales
-● Columns: sale_id (INT), amount (DECIMAL), sale_date (DATE)"""
-
-select ROUND(sum(amount),2) from sales;
-
------
-
-"""Q4 Employee Salary Adjustments
-Scenario: The company is giving a 10% raise to all employees, but the new salary should be
-rounded up to the nearest whole number.
-● Task: Calculate the new salaries.
-● Table: employees
-● Columns: employee_id (INT), current_salary (DECIMAL)"""
-
-Update Employees set current_salary = current_salary *1.10;
-
------
-
-"""Q5 Scenario-Based SQL Date Functions Exercise Questions
-1. Customer Registrations
-Scenario: You need to calculate the number of days since each customer registered.
-● Task:Calculate the days since registration for each customer.
-● Table: customers
-● Columns: customer_id (INT), registration_date (DATE)"""
-
-select customer_id, timestampdiff(day, registration_date, curdate()) from customers;
-
------------------------------------------------------------------------------
-
-Assignment 6
-
-"""Q1 Write an SQL query to analyze sales data by grouping it by product category and
-calculate the total revenue for each category. Display only the categories with total revenue
-greater than $10,000."""
-
-Select category, sum(amount) as revenue from sales
-group by category
-having revenue > 10000;
-
------
-
-"""Q2 Develop an SQL query to retrieve the department names and the count of employees in
-each department. Display only the departments that have more than 50 employees."""
-
-select department_name, count(employee_name) as E_number from employees
-group by department_name
-having E_number > 50;
-
------
-
-"""Q3  Create an SQL query to group the products by their suppliers and calculate the average
-stock quantity for each supplier. Display only the suppliers whose average stock quantity exceeds
-500 units."""
-
-select supplier_id, AVG(stock_quantity) as AVG_QTY
-From products
-Group by supplier_id
-Having AVG_QTY>500;
-
------
-
-"""Q4 Write an SQL query to group customers by their age range (e.g., 18-25, 26-35, etc.) and
-calculate the count of customers in each age range. Display only the age ranges with more than
-100 customers"""
-
-SELECT 
-    CASE 
-        WHEN TIMESTAMPDIFF(YEAR, birth_date, CURDATE()) BETWEEN 18 AND 25 THEN '18-25'
-        WHEN TIMESTAMPDIFF(YEAR, birth_date, CURDATE()) BETWEEN 26 AND 35 THEN '26-35'
-        WHEN TIMESTAMPDIFF(YEAR, birth_date, CURDATE()) BETWEEN 36 AND 45 THEN '36-45'
-        WHEN TIMESTAMPDIFF(YEAR, birth_date, CURDATE()) BETWEEN 46 AND 55 THEN '46-55'
-        WHEN TIMESTAMPDIFF(YEAR, birth_date, CURDATE()) BETWEEN 56 AND 65 THEN '56-65'
-        ELSE '65+' 
-    END AS age_range,
-    COUNT(*) AS customer_count
-FROM customers
-GROUP BY age_range;
-
------
-
-"""Q5  Develop an SQL query to analyze exam scores by grouping them by the subject and
-calculate the average score for each subject. Display only the subjects with an average score
-above 80."""
-
-select subject, avg(score) as AVG_score 
-From exam_scores
-group by subject
-having AVG_score >80;
-
------------------------------------------------------------------------------
-
-Assignment 7
-
-"""Consider Employee table with following attributes
-(emp_id,_name, last_name, department_id,salary)
-And Department table with attributes (department_id,department_name)"""
-
-"""Q1 Find the names of employees who work in the same department as 'Jane Smith'."""
-
-select e.firstname from employee e join department d
-on e.department_id = d.department_id
-where e.department_id = (select d.department_id from employee e join department d
-on e.department_id = d.department_id 
-where firstname="Jane" and lastname = "Smith");
-
------
-
-"""Q2 List the employees whose salary is above the average salary in their department."""
-
-SELECT e.emp_id, e.firstname, e.lastname, e.salary, e.department_id
-FROM Employee e
-WHERE e.salary > (
-    SELECT AVG(salary)
-    FROM Employee
-    WHERE department_id = e.department_id
-)
-ORDER BY e.department_id, e.salary DESC;
-
------
-
-"""Q3 Retrieve the departments which have at least one employee with a salary
-greater than $75,000."""
-
-select d.department_name from department d
-join employee e on e.department_id = d.department_id
-where e.salary>75000;
-
------
-
-"""Q4 Find the highest paid employee in each department."""
-
-SELECT d.department_name, e.firstname, e.salary
-FROM Department d
-JOIN Employee e ON e.department_id = d.department_id
-WHERE e.salary = (
-    SELECT MAX(salary)
-    FROM Employee
-    WHERE department_id = d.department_id
-)
-ORDER BY d.department_name;
-
------
-
-"""Q5 Get the list of employees who earn more than the average salary across all
- departments."""
-
-SELECT e.firstname, e.salary
-FROM Employee e
-WHERE e.salary > (SELECT AVG(e2.salary) FROM Employee e2);
-
------------------------------------------------------------------------------
-
-Assignment 8
-
-""" Consider following tables
-employees(employee_id, name, department_id)
-departments(department_id, department_name)"""
-
-"""Q1 Write a query to get the names of all employees and their corresponding
-department names."""
-
-select e.name, d.department_name from Employees e
-JOIN departments d on e.department_id = d.department_id;
-
------
-
-"""Q2 Write a query to get all employees and their corresponding department
-names. Include employees who do not belong to any department.(Hint-Left
-Join)"""
-
-select e.name, d.department_name from Employees e
-left JOIN departments d on e.department_id = d.department_id;
-
------
-
-"""Q3 Write a query to get all departments and their corresponding employees.
- Include departments that do not have any employees. (Hint- Right Join)"""
-
-select e.name, d.department_name from Employees e
-Right JOIN departments d on e.department_id = d.department_id;
-
------
-
-"""Q4 Write a query to get all employees and their corresponding department names, including
-those employees who do not belong to any department and those departments that do not
-have any employees"""
-
-SELECT e.name AS employee_name, d.department_name
-FROM Employees e
-LEFT JOIN departments d
-ON e.department_id = d.department_id
-UNION
-SELECT e.name AS employee_name, d.department_name
-FROM Employees e
-RIGHT JOIN departments d
-ON e.department_id = d.department_id;
-
------
-
-"""Q5 Write a query to find the total number of employees in each department.
+# Calculate the nth Fibonacci number efficiently
+def fibo(n):
+    dp = [0] * (n+1)
+    dp[1] = 1
+
+    for i in range(2, n+1):
+        dp[i] = dp[i-1] + dp[i-2]
+    return dp
+
+n = 15
+print("Fibonacci Series till",n,"is as follows:")
+print(fibo(n))
+
+"--------------------------------------------------------------------------------------------------"
+
+#Create a one-dimensional NumPy array.
+import numpy as np
+arr = np.arange(1, 11)
+print(arr)
+
+"--------------------------------------------------------------------------------------------------"
+
+#Regular Expression (Regex) Pattern Matching.
+import re
+def find_valid_emails(text):
+    pattern = r'[a-zA-Z0-9._%+-]+@example\.com'
+    emails = re.findall(pattern, text)
+    return emails
+emails = """
+john@example.com, jane_doe@example.in, alice@example.com,
+bob.smith@example.in, carol@example.com, dave@domain.com
 """
+valid_emails = find_valid_emails(emails)
+for email in valid_emails:
+    print(email)
 
-select d.department_name, count(e.name)
-From departments d join employees e 
-ON e.department_id = d.department_id
-group by d.department_name;
+"--------------------------------------------------------------------------------------------------"
 
+#Longest common subsequence between two sequences.
+from functools import lru_cache
 
-"""Q6 Write a query to find the names of employees who work in the department with the
-highest number of employees"""
+def lcs(seq1, seq2):
+    @lru_cache(None)
+    def dp(i, j):
+        if i == 0 or j == 0:
+            return ""
 
-select d.department_name, count(e.name) as number_emp
-From departments d join employees e 
-ON e.department_id = d.department_id
-group by d.department_name
-order by number_emp DESC
-LIMIT 1;
+        if seq1[i - 1] == seq2[j - 1]:
+            return dp(i - 1, j - 1) + seq1[i - 1]
 
------------------------------------------------------------------------------
+        else:
+            lcs1 = dp(i - 1, j)
+            lcs2 = dp(i, j - 1)
+            return lcs1 if len(lcs1) > len(lcs2) else lcs2
 
-Assignment 9
+    n, m = len(seq1), len(seq2)
+    return dp(n, m)
 
-"""Q2 Write a PL/SQL code to find whether a given string is palindrome or not."""
+seq1 = "DEMMMO"
+seq2 = "DEMMMOS"
+result = lcs(seq1, seq2)
+print(result)
 
-DELIMITER $$
-CREATE PROCEDURE check_palindrome(IN input_str VARCHAR(255))
-BEGIN
-    DECLARE reversed_str VARCHAR(255);
-    SET reversed_str = REVERSE(input_str);
+"--------------------------------------------------------------------------------------------------"
 
-    IF input_str = reversed_str THEN
-        SELECT 'The string is a palindrome.' AS result;
-    ELSE
-        SELECT 'The string is NOT a palindrome.' AS result;
-    END IF;
-END $$
-DELIMITER ;
-
-Call check_palindrome("RADA");
-
------
-
-"""Q4 Your company has an employee management system with a table named employees containing
-columns such as employee_id, first_name, last_name, salary, and department_id.-Write a PL/SQL stored procedure named update_salary that takes an employee_id and a
-percentage increase, then updates the employee's salary by the given percentage.-Additionally, ensure the procedure checks if the employee_id exists, and if not, it should raise a
-custom exception."""
-
-CREATE Procedure emp(IN eid INT, IN inc INT)
-BEGIN
-UPDATE employees
-SET Salary = salary * inc Where employee_id = eid;
-END $$
-DELIMITER ;
-CALL emp(1, 2);
-
------
-
-"""Q5  5)Scenario 2: Inventory Control
-Question:-You are tasked with managing the inventory for an online store. There is a table inventory with
-columns product_id, product_name, quantity, and price.-Write a PL/SQL function named calculate_inventory_value that returns the total value of the
-inventory (sum of quantity * price for all products).-This function should be called within a PL/SQL block to display the total inventory value."""
-
-DELIMITER $$
-CREATE PROCEDURE total_revenue()
-BEGIN
-SELECT SUM(quantity*price) FROM inventory;
-END$$
-
-call total_revenue();
-
------------------------------------------------------------------------------
-
-Assignment 10
-
-"""Q1 Consider the Following schema
-Emp (eno, ename, designation, salary, dno)
-Dept (dno dname,dhod)
-Create the trigger on emp Table: The deleted record from the emp table should be insert
-in Dummy Table"""
-
-DELIMITER $$
-CREATE TRIGGER Del_emp
-AFTER DELETE ON Emp
-FOR EACH ROW
-BEGIN
-INSERT INTO dummy VALUES (old.eno, old.ename, old.designation, old.salary, old.dno);
-END$$
-
------
-
-"""Q2 Consider the Following schema
-Boats(Bid, Name, Bcolor)
-Sailors(Sid,Sname, Srating)
-Reserves (Bid, Sid, Date of Reservation)
-Create the trigger on Sailors Table: The Rating of the Sailor should get incremented by 1
-once the sailor reserves a boat."""
-
-DELIMITER $$
-CREATE TRIGGER Incrating
-AFTER INSERT ON Reserves
-FOR EACH ROW
-BEGIN
-UPDATE Sailors set Srating = Srating + 1
-WHERE Sid = new.Sid;
-END$$
+#Configurable Payment Processing System Using Strategy Pattern
+class PaymentStrategy:
+    def pay_amount(self, amount):
+        pass
 
 
------
+class creditcard(PaymentStrategy):
+    def __init__(self, card_number):
+        self.card_number = card_number
 
-CREATE VIEW view_name AS
-SELECT column1, column2, ...
-FROM table_name
-WHERE condition;
+    def pay_amount(self, amount):
+        print("Processing credit card payment of $" + str(amount) + " using card " + str(self.card_number))
 
 
+class PayPal(PaymentStrategy):
+    def __init__(self, email):
+        self.email = email
+
+    def pay_amount(self, amount):
+        print("Processing PayPal payment of $" + str(amount) + " using email " + str(self.email))
+
+
+class bitcoin(PaymentStrategy):
+    def __init__(self, wallet_address):
+        self.wallet_address = wallet_address
+
+    def pay_amount(self, amount):
+        print("Processing Bitcoin payment of $" + str(amount) + " using wallet " + str(self.wallet_address))
+
+
+class Handler:
+    def __init__(self, payment_method: PaymentStrategy):
+        self.payment_method = payment_method
+
+    def update_payment_method(self, payment_method: PaymentStrategy):
+        self.payment_method = payment_method
+
+    def handle_payment(self, amount):
+        self.payment_method.pay_amount(amount)
+
+
+usercreditcard = creditcard("1234-5678-9876-5432")
+userpaypal = PayPal("user@example.com")
+userbitcoin = bitcoin("1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa")
+
+user = Handler(usercreditcard)
+user.handle_payment(100)
+
+user.update_payment_method(userpaypal)
+user.handle_payment(100)
+
+user.update_payment_method(userbitcoin)
+user.handle_payment(100)
+
+"--------------------------------------------------------------------------------------------------"
+
+#Implement a Python program that creates multiple threads to perform different tasks concurrently.
+import time
+import random
+import math
+import threading
+
+def downloadingdata(file_id):
+    print("Starting download for file " + str(file_id) + "...")
+    time.sleep(random.uniform(1, 3))
+    print("Download completed for file " + str(file_id) + ".")
+    time.sleep(1)
+
+def facto(number):
+    print("Starting factorial calculation for " + str(number) + "...")
+    factorial = math.factorial(number)
+    print("Factorial of " + str(number) + " is " + str(factorial) + ".")
+    time.sleep(1)
+
+# Create threads for downloading files
+file_threads = []
+for file_id in range(1, 4):
+    thread = threading.Thread(target=downloadingdata, args=(file_id,))
+    file_threads.append(thread)
+    thread.start()
+
+# Create threads for calculating factorials
+factorial_threads = []
+numbers = [5, 7, 10]
+for number in numbers:
+    thread = threading.Thread(target=facto, args=(number,))
+    factorial_threads.append(thread)
+    thread.start()
+
+# Wait for all threads to complete
+for thread in file_threads + factorial_threads:
+    thread.join()
+
+print("All tasks completed.")
+
+"--------------------------------------------------------------------------------------------------"
+
+#Dynamic Report Generator 1.
+class Report:
+    def __init__(self, title, content):
+        self.title = title
+        self.content = content
+        self.formatted_content = content
+
+    def __str__(self):
+        return f"Title: {self.title}\n\n{self.formatted_content}"
+
+    def __call__(self, formatter):
+        self.formatted_content = formatter(self.content)
+        return self
+
+    @classmethod
+    def create_template(cls, template_name):
+        if template_name == "simple":
+            return cls("Simple Report", "This is a Program of experiment 2 of APP")
+        elif template_name == "detailed":
+            return cls("Detailed Report", "This is a detailed report with more sections.")
+        else:
+            return cls("Custom Report", "Custom report content.")
+
+    def apply_formatting(self, formatting_func):
+        self.formatted_content = formatting_func(self.content)
+
+def bold_format(content):
+    return f"**{content}**"
+
+def italic_format(content):
+    return f"*{content}*"
+
+report = Report("APP Experiment Report", "This is the content of the APP experiment report.")
+print(report)
+
+formatted_report = report(bold_format)
+print(formatted_report)
+
+template_report = Report.create_template("simple")
+template_report.apply_formatting(italic_format)
+print(template_report)
+
+"--------------------------------------------------------------------------------------------------"
+
+#Dynamic Report Generator 2
+class ReportGenerator:
+    def __init__(self, data):
+        self.data = data
+
+    def generate_report(self, columns):
+        report = {}
+        for column in columns:
+            total = sum(float(row[column]) for row in self.data)
+            count = len(self.data)
+            average = total / count if count else 0
+            report[column] = {"Total": total, "Average": average, "Count": count}
+        return report
+
+
+# Example Data
+data = [
+    {"CustomerID": 1, "TotalAmount": 150, "MenuItems": 3},
+    {"CustomerID": 2, "TotalAmount": 200, "MenuItems": 5},
+    {"CustomerID": 3, "TotalAmount": 120, "MenuItems": 2},
+    {"CustomerID": 4, "TotalAmount": 180, "MenuItems": 4}
+]
+
+# Create and print report
+report_generator = ReportGenerator(data)
+report = report_generator.generate_report(["TotalAmount", "MenuItems"])
+
+for column, stats in report.items():
+    print(column + ": " + str(stats))
+
+"--------------------------------------------------------------------------------------------------"
+
+#Library Management
+class Book:
+    def __init__(self, title):
+        self.title = title
+        self.is_borrowed = False
+
+class Patron:
+    def __init__(self, name):
+        self.name = name
+        self.borrowed_books = []
+
+class Library:
+    def __init__(self):
+        self.books = {}
+        self.patrons = {}
+
+    def add_book(self, title):
+        self.books[title] = Book(title)
+        print("Book '" + title + "' added.")
+
+    def register_patron(self, name):
+        self.patrons[name] = Patron(name)
+        print("Patron '" + name + "' registered.")
+
+    def borrow_book(self, patron_name, book_title):
+        patron = self.patrons.get(patron_name)
+        book = self.books.get(book_title)
+        if patron and book and not book.is_borrowed:
+            book.is_borrowed = True
+            patron.borrowed_books.append(book)
+            print("Book '" + book_title + "' borrowed by '" + patron_name + "'.")
+        else:
+            print("Cannot borrow book '" + book_title + "'.")
+
+    def return_book(self, patron_name, book_title):
+        patron = self.patrons.get(patron_name)
+        book = self.books.get(book_title)
+        if patron and book and book in patron.borrowed_books:
+            book.is_borrowed = False
+            patron.borrowed_books.remove(book)
+            print("Book '" + book_title + "' returned by '" + patron_name + "'.")
+        else:
+            print("Cannot return book '" + book_title + "'.")
+
+library = Library()
+library.register_patron("IU")
+library.register_patron("Aryan")
+library.add_book("Ikigai")
+library.add_book("Rich Dad Poor Dad")
+library.add_book("Think and Grow Rich")
+library.add_book("Atomic Habits")
+library.register_patron("MayPal")
+library.borrow_book("IU", "Atomic Habits")
+library.return_book("MayPal", "Rich Dad Poor Dad")
+library.return_book("IU", "Atomic Habits")
 
