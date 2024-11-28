@@ -292,3 +292,38 @@ library.borrow_book("IU", "Atomic Habits")
 library.return_book("MayPal", "Rich Dad Poor Dad")
 library.return_book("IU", "Atomic Habits")
 
+"--------------------------------------------------------------------------------------------------"
+
+#Decorators with Arguments
+def decorator(decorated_function):
+    def decoration(*args, **kwargs):
+        print("Your program is starting...")
+        decorated_function(*args, **kwargs)
+        print("Program ended, thank you!...")
+    return decoration
+
+@decorator
+def add_two_numbers(num1, num2):
+    result = num1 + num2
+    print("Result is :-", result)
+
+add_two_numbers(10, 20)
+
+"--------------------------------------------------------------------------------------------------"
+
+#Generators
+# In this program we will print series of odd and even number using generator
+
+def odd_even_checker(number_range):
+    for i in range(1, number_range):
+        if i % 2 == 0:
+            yield f"{i} is even"
+        else:
+            yield f"{i} is odd"
+
+data = odd_even_checker(20)
+
+for values in data:
+    print(values)
+
+"--------------------------------------------------------------------------------------------------"
